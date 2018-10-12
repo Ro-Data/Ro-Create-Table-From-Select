@@ -3,19 +3,22 @@
 # create_table_from_select
 
 This project provides an easy way to (re-)create a database table directly from
-a SQL `SELECT` statement, without writing (or mantaining) any DDL. However,
-primary keys, foreign keys, and [Amazon Redshift's][redshift] `DISTSTYLE`,
-`DISTKEY`, and `SORTKEY` features can be used via optional YAML configuration
-files.
+a SQL `SELECT` statement, without writing (or maintaining) any [DDL][]
+(specifically, `CREATE TABLE` statements). Primary keys, foreign keys, and
+[Amazon Redshift's][redshift] `DISTSTYLE`, `DISTKEY`, and `SORTKEY` features can
+be used via optional YAML configuration files.
 
+[DDL]: https://en.wikipedia.org/wiki/Data_definition_language
 [redshift]: https://aws.amazon.com/redshift/
 
 The `create_table_from_select.py` script can be used directly, or you can use
 `create_table_from_select_operator.CreateTableFromSelectOperator` with Apache
 Airflow.
 
-The advantage is avoiding the need to explicitly define DDL for your derived
-tables - update the source SQL, and the table will be updated as necessary.
+The advantage is avoiding the need to explicitly write `CREATE TABLE` statements
+for your derived tables, which then need to be updated whenever you add, remove,
+or modify a column: update the source SQL, and the table will change as
+necessary.
 
 ## Requirements
 
@@ -95,9 +98,10 @@ my_orders_summary_op = CreateTableFromSelectOperator(
 
 ### Defining keys
 
-Not having to update DDL every time you add a column is nice, but you might
-still want the ability to define primary and foreign keys. If you're using
-Amazon Redshift, `DISTSTYLE`, `DISTKEY`, and `SORTKEY` are also important.
+Not having to update `CREATE TABLE` statements every time you add a column is
+nice, but you might still want the ability to define primary and foreign keys.
+If you're using Amazon Redshift, `DISTSTYLE`, `DISTKEY`, and `SORTKEY` are also
+important.
 
 To have these added to the DDL generated for your table, create a YAML file such
 as:
@@ -126,11 +130,11 @@ SORTKEY(id)
 
 - In the course of creating the table, a temporary table is first created using
   `SELECT INTO`, so that column and type information can be extracted from
-  `pg_table_def`. The script decides where to insert `INTO [table-name]` by
-  searching for the last occurence of "FROM". This means that:
+  `pg_table_def`. The script decides where to insert "`INTO [table-name]`" by
+  searching for the last occurrence of "`FROM`". This means that:
   - If you don't follow the convention of capitalizing SQL keywords, the script
     won't be able to find the right place.
-  - Even if you do follow that convention, the script can be tricked if you
-    happen to have an "FROM" after the appropriate one (perhaps in a comment).
+  - Even if you do capitalize SQL keywords, the script can be tricked if you
+    happen to have an "`FROM`" after the appropriate one, perhaps in a comment.
 - Building tables incrementally is not supported - the table is rebuilt from
   scratch each time.
