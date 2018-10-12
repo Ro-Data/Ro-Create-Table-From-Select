@@ -20,6 +20,8 @@ for your derived tables, which then need to be updated whenever you add, remove,
 or modify a column: update the source SQL, and the table will change as
 necessary.
 
+The only databases currently supported are PostgreSQL and Amazon Redshift.
+
 ## Requirements
 
 - [`psycopg2`][psycopg2] is required
@@ -128,6 +130,7 @@ SORTKEY(id)
 
 ## Limitations
 
+- The only databases currently supported are PostgreSQL and Amazon Redshift.
 - In the course of creating the table, a temporary table is first created using
   `SELECT INTO`, so that column and type information can be extracted from
   `pg_table_def`. The script decides where to insert "`INTO [table-name]`" by
