@@ -20,7 +20,7 @@ for your derived tables, which then need to be updated whenever you add, remove,
 or modify a column: update the source SQL, and the table will change as
 necessary.
 
-The only databases currently supported are PostgreSQL and Amazon Redshift.
+The only database currently supported is Amazon Redshift.
 
 ## Requirements
 
@@ -28,7 +28,7 @@ The only databases currently supported are PostgreSQL and Amazon Redshift.
 - [`pyyaml`][pyyaml] is required to use the (optional) ability to specify key
   information
 - [`airflow`][airflow] is required to use the (optional)
-  `CreateTableFromSelectOperator` or load PostgreSQL connection information from
+  `CreateTableFromSelectOperator` or load database connection information from
   airflow
 
 [psycopg2]: http://initd.org/psycopg/
@@ -130,7 +130,7 @@ SORTKEY(id)
 
 ## Limitations
 
-- The only databases currently supported are PostgreSQL and Amazon Redshift.
+- The only database currently supported is Amazon Redshift.
 - In the course of creating the table, a temporary table is first created using
   `SELECT INTO`, so that column and type information can be extracted from
   `pg_table_def`. The script decides where to insert "`INTO [table-name]`" by
