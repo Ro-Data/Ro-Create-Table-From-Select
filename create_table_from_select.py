@@ -105,6 +105,18 @@ def generate_table_definition(schema_and_table, column_info,
     return out.getvalue()
 
 
+def create_simple_table_from_select(cursor, source_query, schema, table):
+    table_full_name = '{}.{}'.format(schema, table)
+    # Assume "INTO [table]" can be inserted immediately before the final FROM
+    last_FROM_start_index = source_query.rfind('FROM')
+    select_into_table = (
+        source_query[:last_FROM_start_index]
+        + '\nINTO {}\n'.format(table_full_name)
+        + source_query[last_FROM_start_index:]
+    )
+    execute(cursor, select_into_table)
+
+
 def create_table_from_select(cursor, source_query, schema, table,
                              primary_key=None, foreign_keys=None,
                              diststyle=None, distkey=None, sortkey=None):
@@ -169,7 +181,10 @@ def run(connection_dict, schema, table, sql_directory=None):
     # TODO - Add enforcement of key names, value types
     with psycopg2.connect(**connection_dict) as connection:
         cursor = connection.cursor()
-        create_table_from_select(cursor, query, schema, table, **table_keys)
+        if table_keys:
+            create_table_from_select(cursor, query, schema, table, **table_keys)
+        else:
+            create_simple_table_from_select(cursor, query, schema, table)
         connection.commit()
 
 
